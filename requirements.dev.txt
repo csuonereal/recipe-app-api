@@ -1,0 +1,3 @@
+# the reason we created new requirements is  deployed application does not need below requirements, we use below for only development in local
+
+flake8>=3.9.2,<3.10

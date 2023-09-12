@@ -1,0 +1,22 @@
+version: "3.9"
+
+# build Dockerfile inside current directory
+# map port 8000 on host to port 8000 on container
+# mapping app directory that we created on host to app directory on container
+services:
+  app:
+    build:
+      context: .
+      args:
+        - DEV=true
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app
+    command: >
+      sh -c "python manage.py runserver 0:8000"
+
+# docker-compose run --rm app sh -c "python manage.py startapp core"
+# --rm : remove container after running command
+# app : is name of service in docker-compose.yml
+# sh -c : run command in shell
