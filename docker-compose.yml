@@ -14,9 +14,41 @@ services:
     volumes:
       - ./app:/app
     command: >
-      sh -c "python manage.py runserver 0:8000"
+      sh -c "python manage.py wait_for_db &&
+      python manage.py migrate &&
+      python manage.py runserver 0:8000"
 
+    environment:
+      #we can use name of the service as host name
+      - DB_HOST=db
+      - DB_NAME=devdb
+      - DB_USER=devuser
+      - DB_PASS=changeme
+      - DB_PORT=5432
+    #above port should be 5432, but we are using 5433 because we are mapping 5433 on host to 5432 on container
+    #however, just because the database has started, it does not mean that it's finished setting up and is ready to accept connections.
+    #so there can be race condition between app and db
+    #we need to ensure that db is ready to accept connections before app starts
+    #solution: make django wait for db to be ready before starting, create custom django management command
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13.1-alpine
+    volumes:
+      - dev-db-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_DB=devdb
+      - POSTGRES_USER=devuser
+      - POSTGRES_PASSWORD=changeme
+
+volumes:
+  #we dont need to add after : its handled by docker-compose
+  dev-db-data:
 # docker-compose run --rm app sh -c "python manage.py startapp core"
 # --rm : remove container after running command
 # app : is name of service in docker-compose.yml
 # sh -c : run command in shell
+# python manage.py startapp core : command to run
