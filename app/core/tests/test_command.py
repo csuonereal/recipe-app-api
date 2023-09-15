@@ -27,10 +27,11 @@ class CommandTests(SimpleTestCase):
 
     # what should happen if the database is not available
     @patch('time.sleep')
-    def test_wait_for_db_delay(self, patched_sleep, patched_check):#order is important, en aşağıda olanı en solda olmalı
+    # order is important, en aşağıda olanı en solda olmalı
+    def test_wait_for_db_delay(self, patched_sleep, patched_check):
         """Test waiting for database when getting OperationalError"""
-        
-        #we used patched_sleep because we don't want to wait for 1 seconds
+
+        # we used patched_sleep because we don't want to wait for 1 seconds
         # way that you make it raise an error instead of actually pretending that it is available, you can use side effect
         # first two times it is called, it will raise an Psycopg2Error, and then we raise 3 OperationalErrors, and then we return True
         patched_check.side_effect = [
